@@ -1,75 +1,100 @@
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import nl from "./translations/nl";
+import en from "./translations/en";
+import fr from "./translations/fr";
+import pt from "./translations/pt";
+import es from "./translations/es";
 
-export type Language = "NL" | "EN" | "FR" | "PT";
-
+export type Language = "NL" | "EN" | "FR" | "PT" | "ES";
 export const LANGUAGES: { code: Language; label: string; flag: string }[] = [
   { code: "NL", label: "Nederlands", flag: "🇳🇱" },
-  { code: "EN", label: "English",    flag: "🇬🇧" },
-  { code: "FR", label: "Français",   flag: "🇫🇷" },
-  { code: "PT", label: "Português",  flag: "🇵🇹" },
+  { code: "EN", label: "English", flag: "🇬🇧" },
+  { code: "FR", label: "Français", flag: "🇫🇷" },
+  { code: "PT", label: "Português", flag: "🇵🇹" },
+  { code: "ES", label: "Español", flag: "🇪🇸" },
 ];
 
-type TranslationMap = { [key in Language]: string };
-interface Translations { [key: string]: TranslationMap; }
+const dictionaries = { NL: nl, EN: en, FR: fr, PT: pt, ES: es } as const;
+export const translations = dictionaries;
 
-export const translations: Translations = {
-  navHome:{NL:"HOME",EN:"HOME",FR:"ACCUEIL",PT:"INÍCIO"},
-  navLessons:{NL:"RIJLESSEN",EN:"LESSONS",FR:"LEÇONS",PT:"AULAS"},
-  navAbout:{NL:"OVER ONS",EN:"ABOUT",FR:"À PROPOS",PT:"SOBRE NÓS"},
-  navReviews:{NL:"REVIEWS",EN:"REVIEWS",FR:"AVIS",PT:"AVALIAÇÕES"},
-  navPricing:{NL:"TARIEVEN",EN:"PRICING",FR:"TARIFS",PT:"PREÇOS"},
-  navContact:{NL:"CONTACT",EN:"CONTACT",FR:"CONTACT",PT:"CONTACTO"},
-  navServices:{NL:"DIENSTEN",EN:"SERVICES",FR:"SERVICES",PT:"SERVIÇOS"},
-  bookTrial:{NL:"BOEK PROEFLES",EN:"BOOK TRIAL",FR:"RÉSERVER",PT:"AGENDAR"},
-  heroEyebrow:{NL:"RIJSCHOOL ROTTERDAM RIJNMOND",EN:"DRIVING SCHOOL ROTTERDAM",FR:"AUTO-ÉCOLE ROTTERDAM",PT:"ESCOLA DE CONDUÇÃO ROTTERDAM"},
-  heroHeadline1:{NL:"RIJBEWIJS HALEN",EN:"GET YOUR LICENSE",FR:"OBTENEZ VOTRE PERMIS",PT:"TIRE A SUA CARTA"},
-  heroHeadline2:{NL:"IN JOUW TEMPO",EN:"AT YOUR OWN PACE",FR:"À VOTRE RYTHME",PT:"AO SEU RITMO"},
-  heroSubtext:{NL:"Persoonlijke rijlessen in Rotterdam en omstreken met duidelijke uitleg, rustige begeleiding en lessen in meerdere talen.",EN:"Personal driving lessons in Rotterdam and surrounding area with clear instruction, calm guidance and lessons in multiple languages.",FR:"Cours de conduite personnalisés à Rotterdam et environs avec des explications claires, un accompagnement calme et des leçons en plusieurs langues.",PT:"Aulas de condução personalizadas em Rotterdam e arredores com explicações claras, orientação tranquila e aulas em vários idiomas."},
-  heroServiceArea:{NL:"Actief in Rotterdam (Charlois, IJsselmonde, Feijenoord, Kralingen, Prins Alexander, Delfshaven), Capelle aan den IJssel, Barendrecht, Ridderkerk, Schiedam, Vlaardingen, Spijkenisse, Krimpen aan den IJssel, Maassluis, Albrandswaard, Zwijndrecht en Lansingerland.",EN:"Active in Rotterdam (Charlois, IJsselmonde, Feijenoord, Kralingen, Prins Alexander, Delfshaven), Capelle aan den IJssel, Barendrecht, Ridderkerk, Schiedam, Vlaardingen, Spijkenisse, Krimpen aan den IJssel, Maassluis, Albrandswaard, Zwijndrecht and Lansingerland.",FR:"Actif à Rotterdam (Charlois, IJsselmonde, Feijenoord, Kralingen, Prins Alexander, Delfshaven), Capelle aan den IJssel, Barendrecht, Ridderkerk, Schiedam, Vlaardingen, Spijkenisse, Krimpen aan den IJssel, Maassluis, Albrandswaard, Zwijndrecht et Lansingerland.",PT:"Ativo em Rotterdam (Charlois, IJsselmonde, Feijenoord, Kralingen, Prins Alexander, Delfshaven), Capelle aan den IJssel, Barendrecht, Ridderkerk, Schiedam, Vlaardingen, Spijkenisse, Krimpen aan den IJssel, Maassluis, Albrandswaard, Zwijndrecht e Lansingerland."},
-  heroBullet1:{NL:"Nederlands, Engels, Frans en Portugees",EN:"Dutch, English, French and Portuguese",FR:"Néerlandais, anglais, français et portugais",PT:"Neerlandês, inglês, francês e português"},
-  heroBullet2:{NL:"Deskundige rijinstructeur",EN:"Expert driving instructor",FR:"Instructeur expert",PT:"Instrutor experiente"},
-  heroBullet3:{NL:"Begeleiding op maat",EN:"Tailored guidance",FR:"Accompagnement sur mesure",PT:"Orientação personalizada"},
-  heroBullet4:{NL:"Rustige uitleg",EN:"Calm instruction",FR:"Explications calmes",PT:"Explicações tranquilas"},
-  heroBullet5:{NL:"Persoonlijke aandacht",EN:"Personal attention",FR:"Attention personnelle",PT:"Atenção pessoal"},
-  ctaBookTrial:{NL:"Boek proefles",EN:"Book trial lesson",FR:"Réserver un essai",PT:"Agendar aula"},
-  ctaWhatsapp:{NL:"WhatsApp ons",EN:"WhatsApp us",FR:"WhatsApp",PT:"WhatsApp"},
-  btnBookTrialLesson:{NL:"BEKIJK TARIEVEN",EN:"VIEW PRICING",FR:"VOIR LES TARIFS",PT:"VER PREÇOS"},
-  btnWhatsappUs:{NL:"WHATSAPP BENNO",EN:"WHATSAPP BENNO",FR:"WHATSAPP BENNO",PT:"WHATSAPP BENNO"},
-  heroStat1Label:{NL:"Leerlingen",EN:"Students",FR:"Élèves",PT:"Alunos"},heroStat1Value:{NL:"200+",EN:"200+",FR:"200+",PT:"200+"},
-  heroStat2Label:{NL:"Geslaagd",EN:"Pass rate",FR:"Réussite",PT:"Taxa de aprovação"},heroStat2Value:{NL:"92%",EN:"92%",FR:"92%",PT:"92%"},
-  heroStat3Label:{NL:"Talen",EN:"Languages",FR:"Langues",PT:"Idiomas"},heroStat3Value:{NL:"4",EN:"4",FR:"4",PT:"4"},
-  basedOnReviews:{NL:"Gebaseerd op 50+ reviews",EN:"Based on 50+ reviews",FR:"Basé sur 50+ avis",PT:"Baseado em 50+ avaliações"},
-  servicesLabel:{NL:"DIENSTEN",EN:"SERVICES",FR:"SERVICES",PT:"SERVIÇOS"},servicesHeading:{NL:"WAT WIJ BIEDEN",EN:"WHAT WE OFFER",FR:"CE QUE NOUS OFFRONS",PT:"O QUE OFERECEMOS"},
-  svc1Title:{NL:"Lessen in uw auto",EN:"Lessons in your car",FR:"Cours dans votre voiture",PT:"Aulas no seu carro"},svc1Desc:{NL:"We werken met een moderne stageauto. Rijcomfort en veiligheid staan voorop.",EN:"We work with a modern training car. Driving comfort and safety come first.",FR:"Nous travaillons avec une voiture d'apprentissage moderne.",PT:"Trabalhamos com um carro moderno de instrução."},
-  svc2Title:{NL:"Rijangst begeleiding",EN:"Anxiety support",FR:"Accompagnement phobie",PT:"Apoio à ansiedade"},svc2Desc:{NL:"Speciale begeleiding voor rijangst. Rustig, geduldig en op jouw tempo.",EN:"Special guidance for driving anxiety. Calm, patient and at your pace.",FR:"Accompagnement spécial pour la phobie de conduite.",PT:"Apoio especial para ansiedade ao volante."},
-  svc3Title:{NL:"Meertalige lessen",EN:"Multilingual lessons",FR:"Leçons multilingues",PT:"Aulas multilíngues"},svc3Desc:{NL:"Rijles in Nederlands, Engels, Frans of Portugees. Jij kiest.",EN:"Driving lessons in Dutch, English, French or Portuguese. You choose.",FR:"Leçons en néerlandais, anglais, français ou portugais.",PT:"Aulas em neerlandês, inglês, francês ou português."},
-  svc4Title:{NL:"Flexibele planning",EN:"Flexible hours",FR:"Horaires flexibles",PT:"Horários flexíveis"},svc4Desc:{NL:"Beschikbaar ma-zo van 07:00 tot 23:00. Lessen in overleg gepland.",EN:"Available mon-sun 07:00-23:00. Lessons planned by appointment.",FR:"Disponible lun-dim de 07h à 23h.",PT:"Disponível seg-dom das 07h às 23h."},
-  tbarLangsTitle:{NL:"4 Talen",EN:"4 Languages",FR:"4 Langues",PT:"4 Idiomas"},tbarLangsDesc:{NL:"NL, EN, FR, PT",EN:"NL, EN, FR, PT",FR:"NL, EN, FR, PT",PT:"NL, EN, FR, PT"},
-  tbarRegionTitle:{NL:"Regio Rijnmond",EN:"Rijnmond region",FR:"Région Rijnmond",PT:"Região Rijnmond"},tbarRegionDesc:{NL:"Rotterdam Rijnmond en omgeving",EN:"Rotterdam Rijnmond and surroundings",FR:"Rotterdam Rijnmond et environs",PT:"Rotterdam Rijnmond e arredores"},
-  tbarFlexTitle:{NL:"Flexibel plannen",EN:"Flexible scheduling",FR:"Planning flexible",PT:"Horário flexível"},tbarFlexDesc:{NL:"Lessen in overleg mogelijk",EN:"Lessons by appointment",FR:"Leçons sur rendez-vous",PT:"Aulas por marcação"},
-  tbarPayTitle:{NL:"Gespreid betalen",EN:"Pay in installments",FR:"Paiement échelonné",PT:"Pagamento faseado"},tbarPayDesc:{NL:"Mogelijk bij lespakketten",EN:"Available on lesson packages",FR:"Possible sur les forfaits",PT:"Disponível nos pacotes"},
-  trustSince:{NL:"Sinds 2021",EN:"Since 2021",FR:"Depuis 2021",PT:"Desde 2021"},trustZuid:{NL:"Rotterdam en omstreken",EN:"Rotterdam and surroundings",FR:"Rotterdam et environs",PT:"Rotterdam e arredores"},trustLangs:{NL:"4 talen",EN:"4 languages",FR:"4 langues",PT:"4 idiomas"},trustHours:{NL:"Ma-Zo bereikbaar",EN:"Mon–Sun available",FR:"Lun–Dim joignable",PT:"Seg–Dom disponível"},trustPersonal:{NL:"Persoonlijke begeleiding",EN:"Personal guidance",FR:"Accompagnement personnel",PT:"Acompanhamento pessoal"},
-  trustBadge1:{NL:"Persoonlijke aanpak",EN:"Personal approach",FR:"Approche personnelle",PT:"Abordagem pessoal"},trustBadge2:{NL:"Rotterdam en omstreken",EN:"Rotterdam and surroundings",FR:"Rotterdam et environs",PT:"Rotterdam e arredores"},trustBadge3:{NL:"4 talen",EN:"4 languages",FR:"4 langues",PT:"4 idiomas"},trustBadge4:{NL:"Ma-Zo beschikbaar",EN:"Mon-Sun available",FR:"Lun-Dim disponible",PT:"Seg-Dom disponível"},trustBadge5:{NL:"WhatsApp direct",EN:"WhatsApp direct",FR:"WhatsApp direct",PT:"WhatsApp direto"},
-  statementQuote:{NL:"Er is Geen Limiet.",EN:"There is No Limit.",FR:"Il n'y a Pas de Limite.",PT:"Não Há Limite."},statementSub:{NL:"Bij Rijschool No Limit geloven we dat iedereen een rijbewijs kan halen. In je eigen tempo met begeleiding die bij jou past.",EN:"At Driving School No Limit, we believe everyone can get a driver's license. At your own pace with guidance that suits you.",FR:"À l'Auto-École No Limit, nous croyons que tout le monde peut obtenir un permis. À votre rythme avec un accompagnement adapté.",PT:"Na Escola de Condução No Limit, acreditamos que toda a gente pode tirar a carta. Ao seu ritmo com orientação que se adapta a si."},
-  aboutLabel:{NL:"OVER ONS",EN:"ABOUT US",FR:"À PROPOS DE NOUS",PT:"SOBRE NÓS"},
-  aboutP1:{NL:"Rijschool No Limit is in 2021 opgericht door Benno Coco, een deskundige en gecertificeerde rijinstructeur.",EN:"Driving School No Limit was founded in 2021 by Benno Coco, an expert and certified driving instructor.",FR:"L'Auto-École No Limit a été fondée en 2021 par Benno Coco, un instructeur de conduite expert et certifié.",PT:"A Escola de Condução No Limit foi fundada em 2021 por Benno Coco, um instrutor de condução especialista e certificado."},
-  aboutP2:{NL:"Bij Rijschool No Limit geloven we dat iedereen een rijbewijs kan halen. En dat in hun eigen tempo en met begeleiding die bij hen past.",EN:"At Driving School No Limit, we believe everyone can get a driver's license. And that in their own tempo and with guidance that suits them.",FR:"À l'Auto-École No Limit, nous croyons que tout le monde peut obtenir un permis. À son propre rythme et avec l'accompagnement qui lui convient.",PT:"Na Escola de Condução No Limit, acreditamos que toda a gente pode tirar a carta. E isso ao seu próprio ritmo e com a orientação que lhes convém."},
-  aboutRole:{NL:"Oprichter & Rijinstructeur",EN:"Founder & Driving Instructor",FR:"Fondateur & Instructeur de Conduite",PT:"Fundador & Instrutor de Condução"},
-  pricingLabel:{NL:"TARIEVEN",EN:"PRICING",FR:"TARIFS",PT:"PREÇOS"},pricingHeading:{NL:"ONZE PAKKETTEN",EN:"OUR PACKAGES",FR:"NOS FORMULES",PT:"OS NOSSOS PACOTES"},btnRequest:{NL:"AANVRAGEN",EN:"REQUEST",FR:"DEMANDER",PT:"SOLICITAR"},
-  pricingDisclaimer:{NL:"* Lessen duren 90 minuten voor blokpakketten. Proefles duurt 50 minuten.",EN:"* Lessons last 90 minutes for block packages. Trial lesson lasts 50 minutes.",FR:"* Les leçons durent 90 minutes pour les forfaits. La leçon d'essai dure 50 minutes.",PT:"* As aulas têm 90 minutos para os pacotes. A aula experimental tem 50 minutos."},
-  pkgTrial:{NL:"Proefles",EN:"Trial Lesson",FR:"Leçon d'Essai",PT:"Aula Experimental"},pkg15Blocks:{NL:"15 Bloklessen",EN:"15 Lesson Blocks",FR:"15 Blocs",PT:"15 Blocos de Aulas"},pkg22Blocks:{NL:"22 Bloklessen",EN:"22 Lesson Blocks",FR:"22 Blocs",PT:"22 Blocos de Aulas"},pkg26Blocks:{NL:"26 Bloklessen",EN:"26 Lesson Blocks",FR:"26 Blocs",PT:"26 Blocos de Aulas"},pkgInterim:{NL:"Tussentijdse Toets",EN:"Interim Test",FR:"Test Intermédiaire",PT:"Teste Intermédio"},pkgExam:{NL:"Praktijkexamen",EN:"Practical Exam",FR:"Examen Pratique",PT:"Exame Prático"},mostPopular:{NL:"MEEST GEKOZEN",EN:"MOST POPULAR",FR:"LE PLUS POPULAIRE",PT:"MAIS POPULAR"},
-  ctaSectionHeading:{NL:"KLAAR OM TE BEGINNEN?",EN:"READY TO START?",FR:"PRÊT À COMMENCER ?",PT:"PRONTO PARA COMEÇAR?"},ctaSectionText:{NL:"Boek vandaag nog je proefles en ervaar het verschil van Rijschool No Limit.",EN:"Book your trial lesson today and experience the Rijschool No Limit difference.",FR:"Réservez votre leçon d'essai dès aujourd'hui et découvrez la différence Rijschool No Limit.",PT:"Agende hoje a sua aula experimental e sinta a diferença da Rijschool No Limit."},
-  faqLabel:{NL:"VEELGESTELDE VRAGEN",EN:"FAQ",FR:"FAQ",PT:"PERGUNTAS FREQUENTES"},faqHeading:{NL:"Veelgestelde Vragen",EN:"Frequently Asked Questions",FR:"Questions Fréquentes",PT:"Perguntas Frequentes"},
-  faqQ1:{NL:"Wat kost een proefles?",EN:"What does a trial lesson cost?",FR:"Combien coûte une leçon d'essai ?",PT:"Quanto custa uma aula experimental?"},faqA1:{NL:"Een proefles kost €50 en duurt 50 minuten. Je maakt meteen kennis met Benno en rijdt gelijk mee.",EN:"A trial lesson costs €50 and lasts 50 minutes. You meet Benno straight away and get behind the wheel immediately.",FR:"Une leçon d'essai coûte €50 et dure 50 minutes. Vous faites connaissance avec Benno et prenez le volant immédiatement.",PT:"Uma aula experimental custa €50 e dura 50 minutos. Conhece o Benno imediatamente e conduz logo na primeira aula."},
-  faqQ2:{NL:"Kan ik lessen in het Engels volgen?",EN:"Can I take lessons in English?",FR:"Puis-je suivre des leçons en anglais ?",PT:"Posso ter aulas em inglês?"},faqA2:{NL:"Ja. Benno geeft rijlessen in het Nederlands, Engels, Frans en Portugees. Je kiest zelf de taal waarmee jij je het prettigst voelt.",EN:"Yes. Benno gives driving lessons in Dutch, English, French and Portuguese. You choose the language you feel most comfortable with.",FR:"Oui. Benno donne des leçons en néerlandais, anglais, français et portugais. Vous choisissez la langue dans laquelle vous êtes le plus à l'aise.",PT:"Sim. O Benno dá aulas em neerlandês, inglês, francês e português. Você escolhe o idioma com que se sente mais confortável."},
-  faqQ3:{NL:"Kan ik lessen in het Portugees volgen?",EN:"Can I take lessons in Portuguese?",FR:"Puis-je suivre des leçons en portugais ?",PT:"Posso ter aulas em português?"},faqA3:{NL:"Absoluut. Rijlessen in het Portugees zijn mogelijk. Veel van onze leerlingen uit de Rotterdamse Portugese gemeenschap rijden succesvol hun rijbewijs via Rijschool No Limit.",EN:"Absolutely. Driving lessons in Portuguese are available. Many students from Rotterdam's Portuguese community have successfully passed their test through No Limit.",FR:"Absolument. Les leçons en portugais sont disponibles. De nombreux élèves de la communauté portugaise de Rotterdam ont réussi leur examen via No Limit.",PT:"Com certeza. As aulas em português estão disponíveis. Muitos alunos da comunidade portuguesa de Roterdão tiraram a carta através da No Limit."},
-  faqQ4:{NL:"Hoe snel kan ik starten?",EN:"How quickly can I start?",FR:"Dans combien de temps puis-je commencer ?",PT:"Em quanto tempo posso começar?"},faqA4:{NL:"Meestal kun je binnen één week starten. Stuur Benno een WhatsApp-bericht en hij plant snel een eerste les in.",EN:"Usually within one week. Send Benno a WhatsApp message and he'll schedule your first lesson quickly.",FR:"Généralement dans la semaine. Envoyez un message WhatsApp à Benno et il planifie rapidement votre première leçon.",PT:"Normalmente dentro de uma semana. Envie uma mensagem WhatsApp ao Benno e ele marca rapidamente a primeira aula."},
-  faqQ5:{NL:"Wat kost een praktijkexamen?",EN:"What does a practical exam cost?",FR:"Combien coûte l'examen pratique ?",PT:"Quanto custa o exame prático?"},faqA5:{NL:"Het praktijkexamen kost €310 incl. BTW. Dit zijn de CBR-kosten voor het rijexamen.",EN:"The practical exam costs €310 incl. VAT. These are the CBR costs for the driving test.",FR:"L'examen pratique coûte €310 TVA incluse. Ce sont les frais CBR pour l'examen de conduite.",PT:"O exame prático custa €310 incl. IVA. Estes são os custos do CBR para o exame de condução."},
-  contactLabel:{NL:"CONTACT",EN:"CONTACT",FR:"CONTACT",PT:"CONTACTO"},contactHeading:{NL:"Neem Contact Op",EN:"Get In Touch",FR:"Prenez Contact",PT:"Entre em Contacto"},contactPhone:{NL:"Telefoon",EN:"Phone",FR:"Téléphone",PT:"Telefone"},contactEmail:{NL:"E-mail",EN:"Email",FR:"E-mail",PT:"E-mail"},contactLocation:{NL:"Adres",EN:"Address",FR:"Adresse",PT:"Morada"},contactHoursLabel:{NL:"Openingstijden",EN:"Opening hours",FR:"Horaires",PT:"Horário"},contactHoursValue:{NL:"Ma–Zo 07:00–23:00",EN:"Mon–Sun 07:00–23:00",FR:"Lun–Dim 07:00–23:00",PT:"Seg–Dom 07:00–23:00"},contactKvk:{NL:"KvK: 83089004",EN:"CoC: 83089004",FR:"KvK: 83089004",PT:"KvK: 83089004"},contactFormName:{NL:"Naam",EN:"Name",FR:"Nom",PT:"Nome"},contactFormEmail:{NL:"E-mail",EN:"Email",FR:"E-mail",PT:"E-mail"},contactFormMessage:{NL:"Bericht",EN:"Message",FR:"Message",PT:"Mensagem"},btnSendMessage:{NL:"VERSTUUR BERICHT",EN:"SEND MESSAGE",FR:"ENVOYER",PT:"ENVIAR MENSAGEM"},
-  footerRights:{NL:"Alle rechten voorbehouden.",EN:"All rights reserved.",FR:"Tous droits réservés.",PT:"Todos os direitos reservados."},waPopupTitle:{NL:"Chat met ons op WhatsApp",EN:"Chat with us on WhatsApp",FR:"Chattez sur WhatsApp",PT:"Converse no WhatsApp"},waPopupSub:{NL:"Reageert doorgaans binnen enkele minuten",EN:"Typically replies within minutes",FR:"Répond généralement en quelques minutes",PT:"Normalmente responde em poucos minutos"},waPopupBtn:{NL:"Start Chat",EN:"Start Chat",FR:"Démarrer le Chat",PT:"Iniciar Chat"},stickyWhatsapp:{NL:"WhatsApp Benno",EN:"WhatsApp Benno",FR:"WhatsApp Benno",PT:"WhatsApp Benno"},
+type LanguageContextType = { language: Language; setLanguage: (lang: Language) => void; t: (key: string) => string };
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+const SEO: Record<Language, { title: string; description: string; lang: string; locale: string }> = {
+  NL: { title: "Rijschool Rotterdam & Rijnmond | Rijschool No Limit", description: "Rijschool No Limit in Rotterdam Rijnmond. Proefles €50. Persoonlijke autorijles met Benno Coco in 5 talen.", lang: "nl", locale: "nl_NL" },
+  EN: { title: "Driving School Rotterdam | Rijschool No Limit", description: "Personal driving lessons in Rotterdam and Rijnmond with Benno Coco. Trial lesson €50. Lessons available in 5 languages.", lang: "en", locale: "en_GB" },
+  FR: { title: "Auto-école Rotterdam | Rijschool No Limit", description: "Cours de conduite personnalisés à Rotterdam et Rijnmond avec Benno Coco. Leçon d’essai 50 €. Cours en 5 langues.", lang: "fr", locale: "fr_FR" },
+  PT: { title: "Escola de condução Rotterdam | Rijschool No Limit", description: "Aulas de condução personalizadas em Rotterdam e Rijnmond com Benno Coco. Aula experimental €50. Aulas em 5 idiomas.", lang: "pt", locale: "pt_PT" },
+  ES: { title: "Autoescuela Rotterdam | Rijschool No Limit", description: "Clases de conducción personalizadas en Rotterdam y Rijnmond con Benno Coco. Clase de prueba €50. Clases en 5 idiomas.", lang: "es", locale: "es_ES" },
 };
 
-interface LanguageContextType { language: Language; setLanguage: (lang: Language) => void; t: (key: keyof typeof translations) => string; }
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
-export function LanguageProvider({ children }: { children: ReactNode }) { const [language,setLanguage]=useState<Language>("NL"); const t=(key:keyof typeof translations):string=>translations[key]?.[language]??String(key); return <LanguageContext.Provider value={{language,setLanguage,t}}>{children}</LanguageContext.Provider>; }
-export function useLanguage(){ const context=useContext(LanguageContext); if(!context) throw new Error("useLanguage must be used within a LanguageProvider"); return context; }
+function languageFromUrl(): Language {
+  if (typeof window === "undefined") return "NL";
+  const raw = new URLSearchParams(window.location.search).get("lang")?.toUpperCase();
+  return (["NL", "EN", "FR", "PT", "ES"] as Language[]).includes(raw as Language) ? (raw as Language) : "NL";
+}
+
+function setMeta(selector: string, attribute: string, value: string) {
+  document.querySelector(selector)?.setAttribute(attribute, value);
+}
+
+function syncSeo(language: Language) {
+  if (typeof document === "undefined" || typeof window === "undefined") return;
+  const seo = SEO[language];
+  const url = language === "NL" ? "https://rijschoolnolimit.nl/" : `https://rijschoolnolimit.nl/?lang=${seo.lang}`;
+  document.documentElement.lang = seo.lang;
+  document.title = seo.title;
+  setMeta('meta[name="description"]', "content", seo.description);
+  setMeta('meta[property="og:title"]', "content", seo.title);
+  setMeta('meta[property="og:description"]', "content", seo.description);
+  setMeta('meta[property="og:url"]', "content", url);
+  setMeta('meta[property="og:locale"]', "content", seo.locale);
+  setMeta('meta[name="twitter:title"]', "content", seo.title);
+  setMeta('meta[name="twitter:description"]', "content", seo.description);
+  setMeta('link[rel="canonical"]', "href", url);
+}
+
+function removePublicStreetAddress(language: Language) {
+  if (typeof document === "undefined") return;
+  const replacement = dictionaries[language].tbarRegionDesc;
+  const exact = "Kwartelstraat 11 B, 3082 NE Rotterdam";
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const nodes: Text[] = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode as Text);
+  for (const node of nodes) {
+    if (node.nodeValue?.includes(exact)) node.nodeValue = node.nodeValue.replace(exact, replacement);
+  }
+}
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [language, setLanguageState] = useState<Language>(() => languageFromUrl());
+
+  useEffect(() => {
+    syncSeo(language);
+    removePublicStreetAddress(language);
+  }, [language]);
+
+  const setLanguage = (lang: Language) => {
+    setLanguageState(lang);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (lang === "NL") url.searchParams.delete("lang");
+      else url.searchParams.set("lang", SEO[lang].lang);
+      window.history.replaceState({}, "", url.pathname + url.search + url.hash);
+    }
+  };
+
+  const t = (key: string): string => {
+    const selected = dictionaries[language] as Record<string, string>;
+    const fallback = dictionaries.EN as Record<string, string>;
+    return selected[key] ?? fallback[key] ?? key;
+  };
+
+  return <LanguageContext.Provider value={{ language, setLanguage, t }}>{children}</LanguageContext.Provider>;
+}
+
+export function useLanguage() {
+  const context = useContext(LanguageContext);
+  if (!context) throw new Error("useLanguage must be used within a LanguageProvider");
+  return context;
+}
